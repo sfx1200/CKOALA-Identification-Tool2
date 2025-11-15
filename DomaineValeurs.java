@@ -21,10 +21,8 @@ public class DomaineValeurs {
     public DomaineValeurs(Set<String> elements) {
         this.min = null;
         this.max = null;
-        this.elements = new HashSet<>(elements); // Copie pour éviter les effets de bord [cite: 53]
+        this.elements = new HashSet<>(elements);
     }
-
-    // --- Getters ---
     
     public Double getMin() {
         return min;
@@ -35,64 +33,59 @@ public class DomaineValeurs {
     }
 
     public Set<String> getElements() {
-        // Retourne une copie pour respecter l'encapsulation [cite: 91]
         return (this.elements != null) ? new HashSet<>(this.elements) : null;
     }
 
-    // --- Méthodes utilitaires ---
 
-    // Vérifie si le domaine est un intervalle (basé sur l'initialisation de 'min')
     public boolean isIntervalle() {
         return this.min != null;
     }
 
-    // Vérifie si le domaine est un ensemble (basé sur l'initialisation de 'elements')
     public boolean isEnsemble() {
         return this.elements != null;
     }
 
-    // --- Méthodes principales ---
-
-    /**
-     * Vérifie si une valeur numérique (d'une observation) est dans le domaine.
-     */
+    // Vérifie si une valeur numérique d'une observation est dans le domaine.
     public boolean contient(Double valeur) {
-        if (this.isIntervalle() && valeur != null) {
-            // Vérifie si la valeur est entre les bornes (incluses)
-            return valeur >= this.min && valeur <= this.max;
+        // Vérification de type 
+        if (!this.isIntervalle()) {
+            throw new UnsupportedOperationException(
+                "Impossible de vérifier une valeur Double sur un domaine de type Ensemble."
+            );
         }
-        return false; // Type incompatible ou valeur null
+        if (valeur == null) {
+            return false; 
+        }
+        return valeur >= this.min && valeur <= this.max;
     }
 
-    /**
-     * Vérifie si une valeur symbolique (d'une observation) est dans le domaine.
-     */
+//  Vérifie si une valeur symbolique (d'une observation) est dans le domaine.
     public boolean contient(String valeur) {
-        if (this.isEnsemble() && valeur != null) {
-            // Utilise la vérification rapide du Set
-            return this.elements.contains(valeur);
+        if (!this.isEnsemble()) {
+            throw new UnsupportedOperationException(
+                "Impossible de vérifier une valeur String sur un domaine de type Intervalle."
+            );
         }
-        return false; // Type incompatible ou valeur null
+        
+        if (valeur == null) {
+            return false; 
+        }
+        return this.elements.contains(valeur);
     }
 
-    /**
-     * Vérifie la contrainte d'inclusion [cite: 287] (pour l'héritage des catégories).
-     * Ce domaine (fille) doit être inclus dans le domaine (mère).
-     */
+// Vérifie la contrainte d'inclusion (pour l'héritage des catégories)
     public boolean estCompatible(DomaineValeurs domaineMere) {
-        // Cas 1 : Deux intervalles
+        // Deux intervalles
         if (this.isIntervalle() && domaineMere.isIntervalle()) {
-            // L'intervalle fille doit être inclus dans celui de la mère
             return this.min >= domaineMere.getMin() && this.max <= domaineMere.getMax();
         }
 
-        // Cas 2 : Deux ensembles
+        // Deux ensembles
         if (this.isEnsemble() && domaineMere.isEnsemble()) {
-            // L'ensemble mère doit contenir tous les éléments de la fille
             return domaineMere.getElements().containsAll(this.elements);
         }
 
-        // Cas 3 : Types différents (incompatibles)
+        //incompatibles
         return false;
     }
 }
