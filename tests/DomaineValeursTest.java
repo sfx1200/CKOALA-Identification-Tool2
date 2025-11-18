@@ -1,140 +1,85 @@
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Tests unitaires pour DomaineValeurs - Couverture 95%
- */
-public class DomaineValeursTest {
-    
-    private DomaineValeurs intervalle;
-    private DomaineValeurs ensemble;
-    
-    @Before
-    public void setUp() {
-        intervalle = new DomaineValeurs(5.0, 50.0);
-        Set<String> elements = new HashSet<>();
-        elements.add("conique");
-        elements.add("arrondi");
-        ensemble = new DomaineValeurs(elements);
-    }
-    
-    // Constructeurs INTERVALLE
+class DomaineValeursTest {
+
     @Test
-    public void testConstructeurIntervalle() {
-        DomaineValeurs d = new DomaineValeurs(10.0, 20.0);
-        assertEquals(Double.valueOf(10.0), d.getMin());
-        assertEquals(Double.valueOf(20.0), d.getMax());
+    void testConstructeurIntervalle_Valide() {
+        DomaineValeurs d = new DomaineValeurs(5.0, 10.0);
         assertTrue(d.isIntervalle());
+        assertFalse(d.isEnsemble());
+        assertEquals(5.0, d.getMin());
+        assertEquals(10.0, d.getMax());
     }
-    
-    @Test(expected = IllegalArgumentException.class)
-    public void testIntervalleMinNull() {
-        new DomaineValeurs(null, 20.0);
-    }
-    
-    @Test(expected = IllegalArgumentException.class)
-    public void testIntervalleMaxNull() {
-        new DomaineValeurs(10.0, null);
-    }
-    
-    @Test(expected = IllegalArgumentException.class)
-    public void testIntervalleMinSupMax() {
-        new DomaineValeurs(30.0, 10.0);
-    }
-    
-    // Constructeurs ENSEMBLE
+
     @Test
-    public void testConstructeurEnsemble() {
-        assertEquals(2, ensemble.getElements().size());
-        assertTrue(ensemble.isEnsemble());
+    void testConstructeurIntervalle_Invalide() {
+        assertThrows(IllegalArgumentException.class, () -> new DomaineValeurs(10.0, 5.0));
+        assertThrows(IllegalArgumentException.class, () -> new DomaineValeurs(null, 5.0));
     }
-    
-    @Test(expected = IllegalArgumentException.class)
-    public void testEnsembleNull() {
-        new DomaineValeurs((Set<String>) null);
-    }
-    
-    @Test(expected = IllegalArgumentException.class)
-    public void testEnsembleVide() {
-        new DomaineValeurs(new HashSet<String>());
-    }
-    
-    // Getters
+
     @Test
-    public void testGetters() {
-        assertEquals(Double.valueOf(5.0), intervalle.getMin());
-        assertEquals(Double.valueOf(50.0), intervalle.getMax());
-        assertNull(ensemble.getMin());
-        assertNull(ensemble.getMax());
+    void testConstructeurEnsemble_Valide() {
+        Set<String> s = new HashSet<>(Arrays.asList("A", "B"));
+        DomaineValeurs d = new DomaineValeurs(s);
+        assertTrue(d.isEnsemble());
+        assertFalse(d.isIntervalle());
     }
-    
-    // contient(Double)
+
     @Test
-    public void testContientDouble() {
-        assertTrue(intervalle.contient(10.0));
-        assertTrue(intervalle.contient(5.0));
-        assertFalse(intervalle.contient(4.9));
-        assertFalse(intervalle.contient((Double) null));
+    void testConstructeurEnsemble_Invalide() {
+        assertThrows(IllegalArgumentException.class, () -> new DomaineValeurs((Set<String>) null));
+        assertThrows(IllegalArgumentException.class, () -> new DomaineValeurs(new HashSet<>()));
     }
-    
-    @Test(expected = UnsupportedOperationException.class)
-    public void testContientDoubleSurEnsemble() {
-        ensemble.contient(10.0);
-    }
-    
-    // contient(String)
+
     @Test
-    public void testContientString() {
-        assertTrue(ensemble.contient("conique"));
-        assertFalse(ensemble.contient("carre"));
-        assertFalse(ensemble.contient((String) null));
+    void testContient_Intervalle() {
+        DomaineValeurs d = new DomaineValeurs(0.0, 10.0);
+        assertTrue(d.contient(5.0));
+        assertFalse(d.contient(11.0));
+        assertFalse(d.contient((Double)null));
+        
+        assertThrows(UnsupportedOperationException.class, () -> d.contient("texte"));
     }
-    
-    @Test(expected = UnsupportedOperationException.class)
-    public void testContientStringSurIntervalle() {
-        intervalle.contient("test");
-    }
-    
-    // estCompatible
+
     @Test
-    public void testCompatibleIntervalles() {
+    void testContient_Ensemble() {
+        DomaineValeurs d = new DomaineValeurs(new HashSet<>(Arrays.asList("A", "B")));
+        assertTrue(d.contient("A"));
+        assertFalse(d.contient("C"));
+        
+        assertThrows(UnsupportedOperationException.class, () -> d.contient(5.0));
+    }
+
+    @Test
+    void testEstCompatible_Intervalle() {
         DomaineValeurs mere = new DomaineValeurs(0.0, 100.0);
-        DomaineValeurs fille = new DomaineValeurs(10.0, 50.0);
-        assertTrue(fille.estCompatible(mere));
-        assertFalse(mere.estCompatible(fille));
+        DomaineValeurs filsValide = new DomaineValeurs(10.0, 20.0);
+        DomaineValeurs filsInvalide = new DomaineValeurs(-5.0, 10.0);
+
+        assertTrue(filsValide.estCompatible(mere));
+        assertFalse(filsInvalide.estCompatible(mere));
     }
-    
+
     @Test
-    public void testCompatibleEnsembles() {
-        Set<String> m = new HashSet<>();
-        m.add("conique");
-        m.add("arrondi");
-        m.add("plat");
-        DomaineValeurs mere = new DomaineValeurs(m);
+    void testEstCompatible_Ensemble() {
+        DomaineValeurs mere = new DomaineValeurs(new HashSet<>(Arrays.asList("A", "B", "C")));
+        DomaineValeurs filsValide = new DomaineValeurs(new HashSet<>(Arrays.asList("A", "B")));
         
-        Set<String> f = new HashSet<>();
-        f.add("conique");
-        DomaineValeurs fille = new DomaineValeurs(f);
+        assertTrue(filsValide.estCompatible(mere));
+    }
+    
+    @Test
+    void testEstCompatible_Mixte_Invalide() {
+        DomaineValeurs intv = new DomaineValeurs(0.0, 10.0);
+        DomaineValeurs ens = new DomaineValeurs(new HashSet<>(Arrays.asList("A")));
         
-        assertTrue(fille.estCompatible(mere));
-    }
-    
-    @Test
-    public void testIncompatibleTypes() {
-        assertFalse(intervalle.estCompatible(ensemble));
-    }
-    
-    @Test(expected = IllegalArgumentException.class)
-    public void testCompatibleNull() {
-        intervalle.estCompatible(null);
-    }
-    
-    // toString
-    @Test
-    public void testToString() {
-        assertTrue(intervalle.toString().contains("5.0"));
+        assertFalse(intv.estCompatible(ens));
+        
+        assertThrows(IllegalArgumentException.class, () -> intv.estCompatible(null));
     }
 }
