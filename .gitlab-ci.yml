@@ -1,23 +1,43 @@
-image: maven:3.8-openjdk-17
+image: eclipse-temurin:17-jdk
+
 stages:
   - build
   - test
 
+variables:
+  LIB_FOLDER: "lib"
+  SRC_FOLDER: "src"
+  TEST_FOLDER: "tests" 
+  BUILD_FOLDER: "out"
+
+  JUNIT_JAR: "$LIB_FOLDER/junit-platform-console-standalone.jar"
+  JUNIT_URL: "https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.10.0/junit-platform-console-standalone-1.10.0.jar"
+
+before_script:
+  - echo "--- PRÉPARATION DE L'ENVIRONNEMENT ---"
+  - apt-get update && apt-get install -y curl
+  - mkdir -p $LIB_FOLDER
+  - mkdir -p $BUILD_FOLDER
+  - if [ ! -f "$JUNIT_JAR" ]; then echo "Téléchargement de JUnit..."; curl -L "$JUNIT_URL" -o "$JUNIT_JAR"; fi
+
 compilation:
   stage: build
   script:
-    - echo "Création du dossier de sortie..."
-    - mkdir -p out
-    - echo "Compilation des sources et des tests..."
-    - javac -cp lib/junit-platform-console-standalone.jar -d out/ src/*.java tests/*.java
+    - echo "--- COMPILATION GLOBALE ---"
+    - javac -encoding UTF-8 -d $BUILD_FOLDER $SRC_FOLDER/*.java
+    
+    - javac -encoding UTF-8 -cp "$BUILD_FOLDER:$JUNIT_JAR" -d $BUILD_FOLDER $TEST_FOLDER/*.java
+  
   artifacts:
     paths:
-      - out/
+      - $BUILD_FOLDER/
+      - $LIB_FOLDER/ 
+    expire_in: 1 hour
 
 execution_tests:
   stage: test
   dependencies:
     - compilation
   script:
-    - echo "Lancement de JUnit Platform..."
-    - java -jar lib/junit-platform-console-standalone.jar --class-path out/ --scan-classpath
+    - echo "--- EXÉCUTION DES TESTS ---"
+    - java -jar "$JUNIT_JAR" --class-path "$BUILD_FOLDER" --scan-classpath
