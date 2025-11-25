@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Build-Date: 2023-04-26
+Build-Revision: bd7d03f517dfca3730fbd123c5fd4d4b70930129 
+Build-Time: 08:27:29.511+0200
+Built-By: JUnit Team
+Bundle-ManifestVersion: 2
+Bundle-Name: JUnit Platform Console Standalone
+Bundle-SymbolicName: junit-platform-console-standalone
+Bundle-Version: 1.9.3
+Created-By: 17.0.5 (BellSoft 17.0.5+8-LTS)
+Engine-Version-junit-jupiter: 5.9.3
+Engine-Version-junit-vintage: 5.9.3
+Implementation-Title: junit-platform-console-standalone
+Implementation-Vendor: junit.org
+Implementation-Version: 1.9.3
+Import-Package: kotlin;resolution:=optional,kotlin.collections;resolut
+ ion:=optional,kotlin.jvm.functions;resolution:=optional,kotlin.jvm.in
+ ternal;resolution:=optional,javax.xml.namespace,javax.xml.parsers,jav
+ ax.xml.stream,javax.xml.transform,javax.xml.transform.dom,javax.xml.t
+ ransform.stax,org.w3c.dom
+Main-Class: org.junit.platform.console.ConsoleLauncher
+Multi-Release: true
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=9))"
+Specification-Title: junit-platform-console-standalone
+Specification-Vendor: junit.org
+Specification-Version: 1.9.3
+

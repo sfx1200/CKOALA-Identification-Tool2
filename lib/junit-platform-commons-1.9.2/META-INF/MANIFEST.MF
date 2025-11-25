@@ -1,0 +1,35 @@
+Manifest-Version: 1.0
+Build-Date: 2023-01-10
+Build-Revision: 8ed3c66c7eb20b835cf92f50a7bf8830838c462e 
+Build-Time: 12:01:04.224+0100
+Built-By: JUnit Team
+Bundle-ManifestVersion: 2
+Bundle-Name: JUnit Platform Commons
+Bundle-SymbolicName: junit-platform-commons
+Bundle-Version: 1.9.2
+Created-By: 17.0.5 (BellSoft 17.0.5+8-LTS)
+Export-Package: org.junit.platform.commons;version="1.9.2";status=STABLE
+ ;uses:="org.apiguardian.api,org.junit.platform.commons.util",org.junit.
+ platform.commons.annotation;version="1.9.2";status=STABLE;uses:="org.ap
+ iguardian.api",org.junit.platform.commons.function;version="1.9.2";stat
+ us=MAINTAINED;uses:="org.apiguardian.api",org.junit.platform.commons.lo
+ gging;version="1.9.2";status=INTERNAL;mandatory:=status;uses:="org.apig
+ uardian.api",org.junit.platform.commons.support;version="1.9.2";status=
+ MAINTAINED;uses:="org.apiguardian.api,org.junit.platform.commons,org.ju
+ nit.platform.commons.function",org.junit.platform.commons.util;version=
+ "1.9.2";status=DEPRECATED;uses:="org.apiguardian.api,org.junit.platform
+ .commons,org.junit.platform.commons.function"
+Implementation-Title: junit-platform-commons
+Implementation-Vendor: junit.org
+Implementation-Version: 1.9.2
+Import-Package: org.apiguardian.api;resolution:=optional;version="[1.1,2
+ )",org.junit.platform.commons;version="[1.9,2)",org.junit.platform.comm
+ ons.function;version="[1.9,2)",org.junit.platform.commons.util;version=
+ "[1.9,2)",org.junit.platform.commons.logging;status=INTERNAL;version="[
+ 1.9,2)"
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+Specification-Title: junit-platform-commons
+Specification-Vendor: junit.org
+Specification-Version: 1.9.2
+Multi-Release: true
+
