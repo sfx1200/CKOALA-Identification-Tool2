@@ -1,5 +1,20 @@
 
 # Pepline Status : 
+# TEST DIAGNOSTIC (Gardez celui qui s'affiche)
+
+1. Essai Main (tout minuscule) :
+![test1](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/badges/main/pipeline.svg)
+
+2. Essai Master (tout minuscule) :
+![test2](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/badges/master/pipeline.svg)
+
+3. Essai Main (Avec Majuscules probables) :
+![test3](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/Projet_PPO_CKOALA/badges/main/pipeline.svg)
+
+4. Essai Master (Avec Majuscules probables) :
+![test4](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/Projet_PPO_CKOALA/badges/master/pipeline.svg)
+
+---
 
 
 [![pipeline status](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/badges/master/pipeline.svg)](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/-/commits/master)
