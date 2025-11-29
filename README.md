@@ -1,17 +1,7 @@
 
 # Pepline Status : 
 
-# TEST D'AFFICHAGE
 
-## Option 1 : Si ta branche est "master"
-[![pipeline status](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/badges/master/pipeline.svg)](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/-/commits/master)
-[![coverage report](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/badges/master/coverage.svg)](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/-/commits/master)
-
-## Option 2 : Si ta branche est "main"
-[![pipeline status](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/badges/main/pipeline.svg)](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/-/commits/main)
-[![coverage report](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/badges/main/coverage.svg)](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/-/commits/main)
-[![pipeline status](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/badges/master/pipeline.svg)](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/-/commits/master)
-[![coverage report](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/badges/master/coverage.svg)](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/-/commits/master)
 # Projet PPO - CKOALA : Noyau Fonctionnel
 
 Ce projet implémente le noyau fonctionnel de l'application CKOALA (C'est Quoi Là ?), un assistant numérique d'aide à la classification d'observations naturelles.
