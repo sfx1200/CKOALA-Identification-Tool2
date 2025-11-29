@@ -6,35 +6,39 @@ stages:
   - coverage
   - report
 
-image: openjdk:17-slim
+# CORRECTION ICI : On utilise une image valide car openjdk:17-slim n'existe plus
+image: eclipse-temurin:17-jdk
 
 variables:
   LIB_FOLDER: "lib"
   SRC_FOLDER: "src"
-  TEST_FOLDER: "test"
+  TEST_FOLDER: "test" # J'ai mis "test" au singulier comme demandé
   BUILD_FOLDER: "out"
-  
   JUNIT_REMOTE: "https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.9.3/junit-platform-console-standalone-1.9.3.jar"
   JUNIT_LOCAL: $LIB_FOLDER/"junit-platform-console-standalone.jar"
-  
-  JACOCO_REMOTE: "https://search.maven.org/remotecontent?filepath=org/jacoco/jacoco/0.8.11/jacoco-0.8.11.zip"
+  JACOCO_REMOTE: "https://search.maven.org/remotecontent?filepath=org/jacoco/jacoco/0.8.13/jacoco-0.8.13.zip"
   JACOCO_LOCAL_ZIP: $LIB_FOLDER/"jacoco.zip"
 
-# Installation des dépendances pour tous les jobs
+# Partie demandée exactement comme dans le TP
 before_script:
-  - apt-get update && apt-get install -y curl unzip libxml2-utils bc
-  - mkdir -p $LIB_FOLDER/jacoco
-  - mkdir -p $BUILD_FOLDER
-  - if [ ! -f "$JUNIT_LOCAL" ]; then curl -L $JUNIT_REMOTE -o $JUNIT_LOCAL; fi
-  - if [ ! -f "$JACOCO_LOCAL_ZIP" ]; then curl -L $JACOCO_REMOTE -o $JACOCO_LOCAL_ZIP && unzip -o $JACOCO_LOCAL_ZIP -d $LIB_FOLDER/jacoco; fi
+  - apt-get update && apt-get install -y curl unzip
+  - mkdir -p lib
+  - curl $JUNIT_REMOTE -o $JUNIT_LOCAL
+  - curl -L $JACOCO_REMOTE -o $JACOCO_LOCAL_ZIP
+  - mkdir -p lib/jacoco
+  - unzip -o $JACOCO_LOCAL_ZIP -d $LIB_FOLDER/jacoco
 
 print-info:
   stage: prepare
   script:
     - echo "Using Java version:"
     - java -version
-    - echo "Contenu du répertoire courant :"
-    - ls -R
+
+list-lib-content:
+  stage: prepare
+  script:
+    - echo "Contenu du dossier lib :"
+    - ls -laR $LIB_FOLDER
 
 compile:
   stage: build
@@ -42,67 +46,70 @@ compile:
     - echo "Compilation du code source..."
     - mkdir -p $BUILD_FOLDER/classes
     - javac -encoding UTF-8 -d $BUILD_FOLDER/classes $SRC_FOLDER/*.java
+    - echo "Compilation terminée."
   artifacts:
     paths:
-      - $BUILD_FOLDER/classes
-    expire_in: 1 hour
+      - $BUILD_FOLDER/
+    expire_in: 1 week
 
 compile-tests:
   stage: build-tests
-  dependencies:
-    - compile
   script:
-    - echo "Compilation des tests..."
+    - echo "Compilation des fichiers de test..."
     - mkdir -p $BUILD_FOLDER/test-classes
     - javac -encoding UTF-8 -cp "$JUNIT_LOCAL:$BUILD_FOLDER/classes" -d $BUILD_FOLDER/test-classes $TEST_FOLDER/*.java
+    - echo "Compilation des tests terminée."
   artifacts:
     paths:
-      - $BUILD_FOLDER/test-classes
-    expire_in: 1 hour
+      - $BUILD_FOLDER/
+    expire_in: 1 week
 
 run-tests:
   stage: test
-  dependencies:
-    - compile
-    - compile-tests
   script:
-    - echo "Exécution des tests JUnit..."
-    - java -jar $JUNIT_LOCAL --class-path "$BUILD_FOLDER/classes:$BUILD_FOLDER/test-classes" --scan-class-path --reports-dir=$BUILD_FOLDER/test-reports
+    - echo "Lancement des tests JUnit..."
+    - java -jar $JUNIT_LOCAL --class-path "$BUILD_FOLDER/classes:$BUILD_FOLDER/test-classes" --scan-class-path
+    - echo "Tests terminés."
+  artifacts:
+    paths:
+      - $BUILD_FOLDER/
+    expire_in: 1 week
 
 jacoco:
   stage: coverage
-  dependencies:
-    - compile
-    - compile-tests
   script:
-    - echo "Instrumentation et exécution des tests avec JaCoCo..."
+    - echo "Lancement des tests avec JaCoCo..."
     - java -javaagent:$LIB_FOLDER/jacoco/lib/jacocoagent.jar=destfile=jacoco.exec -jar $JUNIT_LOCAL --class-path "$BUILD_FOLDER/classes:$BUILD_FOLDER/test-classes" --scan-class-path
+    - echo "Fichier jacoco.exec créé."
   artifacts:
     paths:
+      - $BUILD_FOLDER/
       - jacoco.exec
-    expire_in: 1 hour
+    expire_in: 1 week
 
 build-report:
   stage: report
-  dependencies:
-    - compile
-    - jacoco
   script:
-    - echo "Génération du rapport XML et HTML..."
+    - echo "Génération des rapports de couverture..."
     - java -jar $LIB_FOLDER/jacoco/lib/jacococli.jar report jacoco.exec --classfiles $BUILD_FOLDER/classes --sourcefiles $SRC_FOLDER --xml report.xml --html report-html
+    - echo "Rapport XML (report.xml) généré."
+    - echo "Rapport HTML (dossier report-html) généré."
   artifacts:
     paths:
       - report.xml
-      - report-html/
+      - report-html/ 
     expire_in: 1 week
-
+      
 extract-coverage:
   stage: report
   needs:
     - build-report
+  dependencies:
+    - build-report
   script:
-    - echo "Calcul du pourcentage de couverture..."
-    # Utilisation du bloc '|' pour que les variables persistent entre les lignes
+    - echo "Extraction du taux de couverture..."
+    - apt-get update && apt-get install -y libxml2-utils bc
+    # Utilisation du | obligatoire pour que les variables fonctionnent
     - |
       COVERED=$(xmllint --xpath "sum(//counter[@type='INSTRUCTION']/@covered)" report.xml)
       MISSED=$(xmllint --xpath "sum(//counter[@type='INSTRUCTION']/@missed)" report.xml)
@@ -110,3 +117,7 @@ extract-coverage:
       COVERAGE=$(echo "scale=2; $COVERED * 100 / $TOTAL" | bc)
       echo "Code Coverage: ${COVERAGE}%"
   coverage: '/Code Coverage: (\d+\.?\d*)%/'
+  artifacts:
+    paths:
+      - report.xml
+    expire_in: 1 week
