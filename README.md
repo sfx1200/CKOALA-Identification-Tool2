@@ -3,9 +3,7 @@
 
 
 [![pipeline status](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/badges/master/pipeline.svg)](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/-/commits/master)
-
 [![coverage report](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/badges/master/coverage.svg)](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/-/commits/master)
-
 
 # Projet PPO - CKOALA : Noyau Fonctionnel
 
