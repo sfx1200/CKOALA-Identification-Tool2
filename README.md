@@ -2,6 +2,9 @@
 # Pepline Status : 
 
 
+
+[![pipeline status](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/badges/main/pipeline.svg)](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/-/commits/main)
+[![coverage report](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/badges/main/coverage.svg)](https://gitlab.univ-lille.fr/yassine.bourhaba.etu/projet_ppo_ckoala/-/commits/main)
 # Projet PPO - CKOALA : Noyau Fonctionnel
 
 Ce projet implémente le noyau fonctionnel de l'application CKOALA (C'est Quoi Là ?), un assistant numérique d'aide à la classification d'observations naturelles.
