@@ -9,27 +9,23 @@ stages:
 image: openjdk:17-slim
 
 variables:
-  # Configuration des dossiers
   LIB_FOLDER: "lib"
   SRC_FOLDER: "src"
-  TEST_FOLDER: "test"   # Attention: tes tests doivent être dans un dossier "test"
+  TEST_FOLDER: "test"
   BUILD_FOLDER: "out"
-
-  # URLs des outils (JUnit Console permet de lancer JUnit 4 et 5 en même temps)
+  
   JUNIT_REMOTE: "https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.9.3/junit-platform-console-standalone-1.9.3.jar"
   JUNIT_LOCAL: $LIB_FOLDER/"junit-platform-console-standalone.jar"
   
   JACOCO_REMOTE: "https://search.maven.org/remotecontent?filepath=org/jacoco/jacoco/0.8.11/jacoco-0.8.11.zip"
   JACOCO_LOCAL_ZIP: $LIB_FOLDER/"jacoco.zip"
 
-# Installation des dépendances système et Java avant chaque job
+# Installation des dépendances pour tous les jobs
 before_script:
   - apt-get update && apt-get install -y curl unzip libxml2-utils bc
   - mkdir -p $LIB_FOLDER/jacoco
   - mkdir -p $BUILD_FOLDER
-  # Téléchargement de JUnit
   - if [ ! -f "$JUNIT_LOCAL" ]; then curl -L $JUNIT_REMOTE -o $JUNIT_LOCAL; fi
-  # Téléchargement de JaCoCo
   - if [ ! -f "$JACOCO_LOCAL_ZIP" ]; then curl -L $JACOCO_REMOTE -o $JACOCO_LOCAL_ZIP && unzip -o $JACOCO_LOCAL_ZIP -d $LIB_FOLDER/jacoco; fi
 
 print-info:
@@ -40,7 +36,6 @@ print-info:
     - echo "Contenu du répertoire courant :"
     - ls -R
 
-# 1. Compilation du code source
 compile:
   stage: build
   script:
@@ -52,7 +47,6 @@ compile:
       - $BUILD_FOLDER/classes
     expire_in: 1 hour
 
-# 2. Compilation des tests
 compile-tests:
   stage: build-tests
   dependencies:
@@ -60,14 +54,12 @@ compile-tests:
   script:
     - echo "Compilation des tests..."
     - mkdir -p $BUILD_FOLDER/test-classes
-    # On inclut JUnit et les classes compilées dans le classpath
     - javac -encoding UTF-8 -cp "$JUNIT_LOCAL:$BUILD_FOLDER/classes" -d $BUILD_FOLDER/test-classes $TEST_FOLDER/*.java
   artifacts:
     paths:
       - $BUILD_FOLDER/test-classes
     expire_in: 1 hour
 
-# 3. Exécution des tests (JUnit 4 et 5)
 run-tests:
   stage: test
   dependencies:
@@ -77,7 +69,6 @@ run-tests:
     - echo "Exécution des tests JUnit..."
     - java -jar $JUNIT_LOCAL --class-path "$BUILD_FOLDER/classes:$BUILD_FOLDER/test-classes" --scan-class-path --reports-dir=$BUILD_FOLDER/test-reports
 
-# 4. Couverture de code (JaCoCo)
 jacoco:
   stage: coverage
   dependencies:
@@ -91,7 +82,6 @@ jacoco:
       - jacoco.exec
     expire_in: 1 hour
 
-# 5. Génération du rapport XML/HTML
 build-report:
   stage: report
   dependencies:
@@ -106,16 +96,17 @@ build-report:
       - report-html/
     expire_in: 1 week
 
-# 6. Extraction du pourcentage pour le badge GitLab
 extract-coverage:
   stage: report
   needs:
     - build-report
   script:
     - echo "Calcul du pourcentage de couverture..."
-    - COVERED=$(xmllint --xpath "sum(//counter[@type='INSTRUCTION']/@covered)" report.xml)
-    - MISSED=$(xmllint --xpath "sum(//counter[@type='INSTRUCTION']/@missed)" report.xml)
-    - TOTAL=$(echo "$COVERED + $MISSED" | bc)
-    - COVERAGE=$(echo "scale=2; $COVERED * 100 / $TOTAL" | bc)
-    - echo "Code Coverage: ${COVERAGE}%"
+    # Utilisation du bloc '|' pour que les variables persistent entre les lignes
+    - |
+      COVERED=$(xmllint --xpath "sum(//counter[@type='INSTRUCTION']/@covered)" report.xml)
+      MISSED=$(xmllint --xpath "sum(//counter[@type='INSTRUCTION']/@missed)" report.xml)
+      TOTAL=$(echo "$COVERED + $MISSED" | bc)
+      COVERAGE=$(echo "scale=2; $COVERED * 100 / $TOTAL" | bc)
+      echo "Code Coverage: ${COVERAGE}%"
   coverage: '/Code Coverage: (\d+\.?\d*)%/'
