@@ -6,22 +6,23 @@ stages:
   - coverage
   - report
 
-# CORRECTION ICI : On utilise une image valide car openjdk:17-slim n'existe plus
 image: eclipse-temurin:17-jdk
 
 variables:
   LIB_FOLDER: "lib"
   SRC_FOLDER: "src"
-  TEST_FOLDER: "test" # J'ai mis "test" au singulier comme demandé
+  # J'ai remis "tests" (avec s). Si votre dossier est "test", changez juste cette ligne.
+  TEST_FOLDER: "tests" 
   BUILD_FOLDER: "out"
+  
   JUNIT_REMOTE: "https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.9.3/junit-platform-console-standalone-1.9.3.jar"
   JUNIT_LOCAL: $LIB_FOLDER/"junit-platform-console-standalone.jar"
+  
   JACOCO_REMOTE: "https://search.maven.org/remotecontent?filepath=org/jacoco/jacoco/0.8.13/jacoco-0.8.13.zip"
   JACOCO_LOCAL_ZIP: $LIB_FOLDER/"jacoco.zip"
 
-# Partie demandée exactement comme dans le TP
 before_script:
-  - apt-get update && apt-get install -y curl unzip
+  - apt-get update && apt-get install -y curl unzip libxml2-utils bc
   - mkdir -p lib
   - curl $JUNIT_REMOTE -o $JUNIT_LOCAL
   - curl -L $JACOCO_REMOTE -o $JACOCO_LOCAL_ZIP
@@ -57,6 +58,12 @@ compile-tests:
   script:
     - echo "Compilation des fichiers de test..."
     - mkdir -p $BUILD_FOLDER/test-classes
+    
+    # --- DEBUG : Affiche où sont les fichiers si l'erreur persiste ---
+    - echo "Vérification de l'emplacement des tests :"
+    - ls -R
+    # -----------------------------------------------------------------
+
     - javac -encoding UTF-8 -cp "$JUNIT_LOCAL:$BUILD_FOLDER/classes" -d $BUILD_FOLDER/test-classes $TEST_FOLDER/*.java
     - echo "Compilation des tests terminée."
   artifacts:
@@ -108,8 +115,6 @@ extract-coverage:
     - build-report
   script:
     - echo "Extraction du taux de couverture..."
-    - apt-get update && apt-get install -y libxml2-utils bc
-    # Utilisation du | obligatoire pour que les variables fonctionnent
     - |
       COVERED=$(xmllint --xpath "sum(//counter[@type='INSTRUCTION']/@covered)" report.xml)
       MISSED=$(xmllint --xpath "sum(//counter[@type='INSTRUCTION']/@missed)" report.xml)
