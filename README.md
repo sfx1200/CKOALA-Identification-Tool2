@@ -1,4 +1,6 @@
 
+Projet Réalisé par Soufiane Derouich et Yassine Bourhaba dans le cadre du module Projet de Programation orientée objet.
+
 # Pepline Status : 
 
 
@@ -55,6 +57,5 @@ Assurez-vous d'abord que les fichiers de tests sont bien compilés dans le dossi
 ##Compilation
 javac -encoding UTF-8 -cp lib/junit-platform-console-standalone.jar -d out/ src/*.java tests/*.java
 ##Execution
-java -jar lib/junit-platform-console-standalone.jar --class-path out/ --scan-classpath
+java -jar lib/junit-platform-console-standalone.jar --class-path out/ --scan-classpath 
 
-Projet Réalisé par Soufiane Derouich et Yassine Bourhaba dans le cadre du module Projet de Programation orientée objet.
