@@ -16,6 +16,7 @@ Il est destiné aux membres de l'équipe ainsi qu'aux futurs développeurs (Phas
   * Développement de la classe `Observation` et gestion des types (Double/String).
   * Écriture des tests unitaires pour les classes (`ObservationTest`, `DomaineValeursTest`,`CategorieTest`).
   * Revue de code et commentaire.
+  * configuration de l'intégration continue (CI/CD GitLab)
 
 
 ## 2. Choix Techniques
