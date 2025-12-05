@@ -11,7 +11,6 @@ image: eclipse-temurin:17-jdk
 variables:
   LIB_FOLDER: "lib"
   SRC_FOLDER: "src"
-  # J'ai remis "tests" (avec s). Si votre dossier est "test", changez juste cette ligne.
   TEST_FOLDER: "tests" 
   BUILD_FOLDER: "out"
   
@@ -58,12 +57,8 @@ compile-tests:
   script:
     - echo "Compilation des fichiers de test..."
     - mkdir -p $BUILD_FOLDER/test-classes
-    
-    # --- DEBUG : Affiche où sont les fichiers si l'erreur persiste ---
     - echo "Vérification de l'emplacement des tests :"
     - ls -R
-    # -----------------------------------------------------------------
-
     - javac -encoding UTF-8 -cp "$JUNIT_LOCAL:$BUILD_FOLDER/classes" -d $BUILD_FOLDER/test-classes $TEST_FOLDER/*.java
     - echo "Compilation des tests terminée."
   artifacts:
@@ -97,8 +92,23 @@ jacoco:
 build-report:
   stage: report
   script:
-    - echo "Génération des rapports de couverture..."
-    - java -jar $LIB_FOLDER/jacoco/lib/jacococli.jar report jacoco.exec --classfiles $BUILD_FOLDER/classes --sourcefiles $SRC_FOLDER --xml report.xml --html report-html
+    - echo "Génération des rapports de couverture (classes filtrées)..."
+    # Création des dossiers pour les classes filtrées
+    - mkdir -p $BUILD_FOLDER/filtered-classes
+    
+    # Copie uniquement des classes à analyser
+    - |
+      for class in Categorie DomainesValeurs Observation; do
+        if [ -f "$BUILD_FOLDER/classes/${class}.class" ]; then
+          cp "$BUILD_FOLDER/classes/${class}.class" "$BUILD_FOLDER/filtered-classes/"
+          echo "Classe ${class}.class copiée pour l'analyse"
+        else
+          echo "ATTENTION: Classe ${class}.class non trouvée"
+        fi
+      done
+    
+    # Génération du rapport uniquement sur les classes filtrées
+    - java -jar $LIB_FOLDER/jacoco/lib/jacococli.jar report jacoco.exec --classfiles $BUILD_FOLDER/filtered-classes --sourcefiles $SRC_FOLDER --xml report.xml --html report-html
     - echo "Rapport XML (report.xml) généré."
     - echo "Rapport HTML (dossier report-html) généré."
   artifacts:
